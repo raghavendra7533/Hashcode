@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hashcode</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=VT323&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      background: #000;
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    .terminal {
+      font-size: clamp(1.5rem, 5vw, 3rem);
+      min-height: 1.2em;
+      letter-spacing: 0.05em;
+      position: relative;
+    }
+
+    .terminal-text {
+      display: inline;
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 0.6em;
+      height: 1.1em;
+      background: #fff;
+      margin-left: 2px;
+      vertical-align: text-bottom;
+      animation: blink 1s step-end infinite;
+    }
+
+    .cursor.stopped {
+      animation: none;
+      display: none;
+    }
+
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+
+    .logo-font {
+      font-family: 'VT323', monospace;
+      font-size: clamp(2rem, 6vw, 4rem);
+      letter-spacing: 0.1em;
+    }
+
+    .form-container {
+      margin-top: 4rem;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+      width: 100%;
+      max-width: 320px;
+    }
+
+    .form-container.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      background: transparent;
+      border: 1px solid #fff;
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.875rem;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    input:focus {
+      border-color: rgba(255, 255, 255, 0.6);
+    }
+
+    button {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      background: #fff;
+      border: 1px solid #fff;
+      color: #000;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    button:hover {
+      background: transparent;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="terminal">
+      <span class="terminal-text" id="text"></span><span class="cursor" id="cursor"></span>
+    </div>
+    <div class="form-container" id="form-container">
+      <form id="waitlist-form">
+        <div class="form-group">
+          <input type="text" name="name" placeholder="Name" required autocomplete="name">
+        </div>
+        <div class="form-group">
+          <input type="email" name="email" placeholder="Email" required autocomplete="email">
+        </div>
+        <button type="submit">Join Waitlist</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const textEl = document.getElementById('text');
+      const cursorEl = document.getElementById('cursor');
+      const formContainer = document.getElementById('form-container');
+
+      const words = ['comfort', 'exclusive', 'refined'];
+      const finalText = '</hashcode>';
+
+      const TYPE_SPEED = 120;
+      const DELETE_SPEED = 60;
+      const PAUSE_AFTER_WORD = 1200;
+      const PAUSE_BEFORE_DELETE = 800;
+      const PAUSE_BEFORE_FINAL = 600;
+
+      function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      }
+
+      async function typeText(text) {
+        for (let i = 0; i < text.length; i++) {
+          textEl.textContent += text[i];
+          await sleep(TYPE_SPEED);
+        }
+      }
+
+      async function deleteText() {
+        const current = textEl.textContent;
+        for (let i = current.length; i > 0; i--) {
+          textEl.textContent = current.substring(0, i - 1);
+          await sleep(DELETE_SPEED);
+        }
+      }
+
+      async function run() {
+        await sleep(800);
+
+        for (let i = 0; i < words.length; i++) {
+          await typeText(words[i]);
+          await sleep(PAUSE_AFTER_WORD);
+          await sleep(PAUSE_BEFORE_DELETE);
+          await deleteText();
+          await sleep(400);
+        }
+
+        await sleep(PAUSE_BEFORE_FINAL);
+        await typeText(finalText);
+
+        await sleep(300);
+        cursorEl.classList.add('stopped');
+        textEl.classList.add('logo-font');
+
+        await sleep(600);
+        formContainer.classList.add('visible');
+      }
+
+      run();
+    })();
+  </script>
+</body>
+</html>
